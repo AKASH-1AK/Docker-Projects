@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Update and upgrade packages
+echo "Updating system..."
+sudo apt update && sudo apt upgrade -y
+
+# Install OpenSSH server and client
+echo "Installing OpenSSH server and client..."
+sudo apt install openssh-server openssh-client -y
+
+# Start and enable SSH service
+echo "Starting and enabling SSH service..."
+sudo service ssh start
+sudo systemctl enable ssh
+
+# Configure SSH for secure access
+echo "Configuring SSH settings..."
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sudo sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+
+# Restart SSH service
+echo "Restarting SSH service..."
+sudo systemctl restart ssh
+
+# Generate SSH key pair (client-side)
+echo "Generating SSH key pair..."
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+
+echo "SSH setup complete. Use ssh username@server-ip to connect."
