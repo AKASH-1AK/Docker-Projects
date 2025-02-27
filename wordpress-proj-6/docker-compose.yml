@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0  # Updated from 5.7 to 8.0 for better performance and security
+    container_name: wordpress_db
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped  # More efficient than "always"
+    environment:
+      MYSQL_ROOT_PASSWORD: your_mysql_root_password
+      MYSQL_DATABASE: your_mysql_database_name
+      MYSQL_USER: your_mysql_username
+      MYSQL_PASSWORD: your_mysql_password
+    ports:
+      - "3306:3306"  # Exposing MySQL for external connections (optional)
+    networks:
+      - wordpress_network
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    container_name: wordpress_app
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: your_mysql_username
+      WORDPRESS_DB_PASSWORD: your_mysql_password
+      WORDPRESS_DB_NAME: your_mysql_database_name
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - wordpress_network
+
+volumes:
+  db_data:
+  wordpress_data:
+
+networks:
+  wordpress_network:
